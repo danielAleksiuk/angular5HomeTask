@@ -1,0 +1,177 @@
+<div class="row">
+  <div class="col-md-12">
+    <h3 class="text-center">
+      {{user?.name}}
+    </h3>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-8 col-sm-12">
+    <span class="font-weight-bold">User ID:</span> {{user?.id}}
+    <br>
+
+    <span class="font-weight-bold">Phone:</span> {{user?.phone}}
+    <br>
+
+    <span class="font-weight-bold">Email:</span> {{user?.email}}
+    <br>
+
+    <div class="btn-group">
+        <button type="button" class="btn btn-primary" (click)="openModal(createTemplate,newTask)">
+          Create new task
+        </button>
+
+        <button type="button" class="btn btn-secondary">
+          <a routerLink="/usersList">Get Back to the users list</a>
+        </button>
+    </div>
+  </div>
+  <div class="col-md-4 col-sm-12">
+    <canvas baseChart
+            [data]="pieChartData"
+            [labels]="pieChartLabels"
+            [chartType]="pieChartType"></canvas>
+
+  </div>
+
+</div>
+
+<div class="row">
+  <div class="col-md-12 text-right">
+    Show:
+    <a [ngClass]="{'active-filter': selectedAllTasks}" (click)="showAllTasks()">All</a> /
+    <a [ngClass]="{'active-filter': selectedCompletedTasks}" (click)="filterTasks(true)">Completed</a> /
+    <a [ngClass]="{'active-filter': selectedUncompletedTasks}" (click)="filterTasks(false)">In-progress</a>
+  </div>
+</div>
+
+<table class="table table-hover table-bordered">
+  <thead>
+  <tr>
+    <th scope="col">Task ID</th>
+    <th scope="col">Task</th>
+    <th scope="col">Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let task of tasksList">
+    <th scope="row">{{task.id}}</th>
+    <td>{{task.title}}</td>
+    <td>
+      <span *ngIf="task.completed">Done</span>
+      <span *ngIf="!task.completed">Undone</span>
+      /
+      <a (click)="openModal(editTemplate, task)"> Edit</a>
+      /
+      <a (click)="openModal(deleteTemplate, task)">Delete</a>
+    </td>
+  </tr>
+
+  </tbody>
+</table>
+
+<ng-template #editTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Edit Task</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="form-group row">
+      <label for="staticID" class="col-sm-4 col-form-label">Task ID:</label>
+      <div class="col-sm-8">
+        <input type="text" readonly class="form-control-plaintext" id="staticID" value="{{ taskModal.id }}">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="staticUserID" class="col-sm-4 col-form-label">User ID:</label>
+      <div class="col-sm-8">
+        <input type="text" readonly class="form-control-plaintext" id="staticUserID" value="{{ taskModal.userId }}">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="inputTitle" class="col-sm-4 col-form-label">Title:</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="inputTitle" value="{{taskModal.title}}"
+               [(ngModel)]="taskModal.title">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="inputStatus" class="col-sm-4 col-form-label">Status:</label>
+      <div class="col-sm-8">
+        <select class="form-control" id="inputStatus" [(ngModel)]="taskModal.completed">
+          <option value="true">Completed</option>
+          <option value="false">In-Progress</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-danger" (click)="editTask(taskModal);modalRef.hide()">Save</button>
+    <button class="btn btn-secondary" (click)="modalRef.hide()">Cancel</button>
+  </div>
+</ng-template>
+
+<ng-template #createTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Create Task</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="form-group row">
+      <label for="staticNewUserID" class="col-sm-4 col-form-label">User ID:</label>
+      <div class="col-sm-8">
+        <input type="text" readonly class="form-control-plaintext" id="staticNewUserID" value="{{ taskModal.userId }}">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="inputNewTitle" class="col-sm-4 col-form-label">Title:</label>
+      <div class="col-sm-8">
+        <input type="text" class="form-control" id="inputNewTitle" value="{{taskModal.title}}"
+               [(ngModel)]="taskModal.title">
+      </div>
+    </div>
+
+    <div class="form-group row">
+      <label for="inputNewStatus" class="col-sm-4 col-form-label">Status:</label>
+      <div class="col-sm-8">
+        <select class="form-control" id="inputNewStatus" [(ngModel)]="taskModal.completed">
+          <option value="true" selected>Completed</option>
+          <option value="false">In-Progress</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger" (click)="createTask(taskModal);modalRef.hide()">Create</button>
+    <button class="btn btn-secondary" (click)="modalRef.hide()">Cancel</button>
+  </div>
+</ng-template>
+
+
+
+<ng-template #deleteTemplate>
+  <div class="modal-header">
+    <h4 class="modal-title pull-left">Delete Task</h4>
+    <button type="button" class="close pull-right" aria-label="Close" (click)="modalRef.hide()">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    Do you want to delete '{{taskModal.title}}' task?
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-danger" (click)="deleteTask(taskModal.id);modalRef.hide()">Yes</button>
+    <button class="btn btn-secondary" (click)="modalRef.hide()">No</button>
+  </div>
+</ng-template>
